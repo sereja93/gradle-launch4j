@@ -1,4 +1,7 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
     id "com.gradle.plugin-publish" version "1.2.1"
     id 'java-gradle-plugin'
     id 'groovy'
@@ -12,6 +15,29 @@ plugins {
 
 repositories {
     mavenCentral()
+    if ("$nexusUsername".isEmpty()) {
+        nexusUsername = project.hasProperty('nexusUsername') ? project.property('nexusUsername')
+            : System.getenv('NEXUS_USERNAME')
+    }
+
+    if ("$nexusPassword".isEmpty()) {
+        nexusPassword = project.hasProperty('nexusPassword') ? project.property('nexusPassword')
+            : System.getenv('NEXUS_PASSWORD')
+    }
+
+    def eragaNexusCredentials = {
+        username "$nexusUsername"
+        password "$nexusPassword"
+    }
+
+    maven {
+        credentials eragaNexusCredentials
+        url "https://packages.eraga.net/repository/eraga-private-maven-unstable/"
+    }
+    maven {
+        credentials eragaNexusCredentials
+        url "https://packages.eraga.net/repository/eraga-private-maven-releases/"
+    }
 }
 
 ext {
@@ -26,7 +52,7 @@ testSets {
 dependencies {
     implementation gradleApi()
     implementation localGroovy()
-    implementation ("net.sf.launch4j:launch4j:${ARTIFACT_VERSION}:core") {
+    implementation("net.eraga.launch4j:launch4j:${ARTIFACT_VERSION}:core") {
         exclude(group: 'org.apache.ant', module: '*')
         exclude(group: 'net.java.abeille', module: '*')
         exclude(group: 'com.jgoodies', module: '*')
@@ -35,10 +61,9 @@ dependencies {
         exclude(group: 'commons-logging', module: '*')
         exclude(group: 'com.thoughtworks.xstream')
     }
-    implementation 'com.thoughtworks.xstream:xstream:1.4.20'
-
+    implementation 'com.thoughtworks.xstream:xstream:1.4.21'
     testImplementation gradleTestKit()
-    testImplementation ("org.spockframework:spock-core:${spock_version}") {
+    testImplementation("org.spockframework:spock-core:${spock_version}") {
         exclude group: 'org.codehaus.groovy'
         exclude group: 'junit'
     }
@@ -116,3 +141,7 @@ jacocoTestReport {
 }
 
 check.dependsOn jacocoTestReport
+
+tasks.named('shadowJar', ShadowJar) {
+    classifier = ""
+}

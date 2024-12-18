@@ -85,6 +85,7 @@ class Launch4jPluginExtension implements Launch4jConfiguration {
         supportUrl = objectFactory.property(String)
         stayAlive = objectFactory.property(Boolean)
         restartOnCrash = objectFactory.property(Boolean)
+        restartOnStatus = objectFactory.property(Integer)
         duplicatesStrategy = objectFactory.property(DuplicatesStrategy)
         manifest = objectFactory.property(String)
         icon = objectFactory.property(String)
@@ -145,6 +146,7 @@ class Launch4jPluginExtension implements Launch4jConfiguration {
             supportUrl.convention('')
             stayAlive.convention(false)
             restartOnCrash.convention(false)
+            restartOnStatus.convention(0)
             duplicatesStrategy.convention(DuplicatesStrategy.EXCLUDE)
             manifest.convention('')
             icon.convention('')
@@ -188,6 +190,7 @@ class Launch4jPluginExtension implements Launch4jConfiguration {
             supportUrl.set('')
             stayAlive.set(false)
             restartOnCrash.set(false)
+            restartOnStatus.set(0)
             duplicatesStrategy.set(DuplicatesStrategy.EXCLUDE)
             manifest.set('')
             icon.set('')
@@ -288,6 +291,11 @@ class Launch4jPluginExtension implements Launch4jConfiguration {
     @Input
     @Optional
     final Property<Boolean> restartOnCrash
+
+    @Input
+    @Optional
+    final Property<Integer> restartOnStatus
+
     @Input
     @Optional
     final Property<DuplicatesStrategy> duplicatesStrategy

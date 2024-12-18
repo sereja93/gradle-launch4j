@@ -85,6 +85,7 @@ abstract class DefaultLaunch4jTask extends DefaultTask implements Launch4jConfig
         supportUrl = objectFactory.property(String)
         stayAlive = objectFactory.property(Boolean)
         restartOnCrash = objectFactory.property(Boolean)
+        restartOnStatus = objectFactory.property(Integer)
         duplicatesStrategy = objectFactory.property(DuplicatesStrategy)
         manifest = objectFactory.property(String)
         icon = objectFactory.property(String)
@@ -140,6 +141,7 @@ abstract class DefaultLaunch4jTask extends DefaultTask implements Launch4jConfig
             supportUrl.convention(config.supportUrl)
             stayAlive.convention(config.stayAlive)
             restartOnCrash.convention(config.restartOnCrash)
+            restartOnStatus.convention(config.restartOnStatus)
             duplicatesStrategy.convention(config.duplicatesStrategy)
             manifest.convention(config.manifest)
             icon.convention(config.icon)
@@ -195,6 +197,7 @@ abstract class DefaultLaunch4jTask extends DefaultTask implements Launch4jConfig
             supportUrl.set(config.supportUrl)
             stayAlive.set(config.stayAlive)
             restartOnCrash.set(config.restartOnCrash)
+            restartOnStatus.set(config.restartOnStatus)
             duplicatesStrategy.set(config.duplicatesStrategy)
             manifest.set(config.manifest)
             icon.set(config.icon)
@@ -250,6 +253,7 @@ abstract class DefaultLaunch4jTask extends DefaultTask implements Launch4jConfig
         if (!workingJar) {
             throw new Exception("launch4j binary jar ${workingDirName} file not found! Expected ${workingDirName}.jar but got ${launch4jBinaryFiles.files.collect { it.name }}. Use the correct classifier for this platform.")
         }
+        println(workingJar)
         workingJar
     }
 
@@ -468,6 +472,10 @@ abstract class DefaultLaunch4jTask extends DefaultTask implements Launch4jConfig
     @Input
     @Optional
     final Property<Boolean> restartOnCrash
+
+    @Input
+    @Optional
+    final Property<Integer> restartOnStatus
 
     @Input
     @Optional

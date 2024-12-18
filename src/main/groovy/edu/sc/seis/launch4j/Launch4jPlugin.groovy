@@ -67,7 +67,7 @@ class Launch4jPlugin implements Plugin<Project> {
             task.description = 'Runs all tasks that implement DefaultLaunch4jTask'
             task.dependsOn = project.tasks.withType(DefaultLaunch4jTask.class)
         }
-        project.tasks.withType(DefaultLaunch4jTask.class).configureEach {it.launch4jBinaryFiles.from(l4jConfig)}
+        project.tasks.withType(DefaultLaunch4jTask.class).configureEach { it.launch4jBinaryFiles.from(l4jConfig) }
     }
 
 
@@ -81,17 +81,30 @@ class Launch4jPlugin implements Plugin<Project> {
         if (project.repositories.isEmpty()) {
             project.logger.debug("Adding the mavenCentral repository to retrieve the $LAUNCH4J_PLUGIN_NAME files.")
             project.repositories.mavenCentral()
+            def eragaRepRelease = project.repositories.mavenCentral()
+            eragaRepRelease.setUrl("https://packages.eraga.net/repository/eraga-private-maven-releases/")
+
+            def nexusUsername = project.hasProperty('nexusUsername') ? project.property('nexusUsername')
+                : System.getenv('NEXUS_USERNAME')
+
+            def nexusPassword = project.hasProperty('nexusPassword') ? project.property('nexusPassword')
+                : System.getenv('NEXUS_PASSWORD')
+
+            eragaRepRelease.credentials({
+                it.username = nexusUsername
+                it.password = nexusPassword
+            })
         }
-        binaryConfig.resolutionStrategy.dependencySubstitution{
+        binaryConfig.resolutionStrategy.dependencySubstitution {
             all { DependencySubstitution dependency ->
                 if (dependency.requested instanceof ModuleComponentSelector && dependency.requested.group == 'net.sf.launch4j' && dependency.requested.module == 'launch4j') {
                     // does not work to add the classifier here, so the user must supply it.
-                    dependency.useTarget "net.sf.launch4j:launch4j:${dependency.requested.version}:${workdir()}"
+                    dependency.useTarget "net.eraga.launch4j:launch4j:${dependency.requested.version}:${workdir()}"
                 }
             }
         }
-        def l4jArtifact = "net.sf.launch4j:launch4j:${ARTIFACT_VERSION}"
-        binaryConfig.defaultDependencies {it.add(project.dependencies.create("${l4jArtifact}:${workdir()}"))}
+        def l4jArtifact = "net.eraga.launch4j:launch4j:${ARTIFACT_VERSION}"
+        binaryConfig.defaultDependencies { it.add(project.dependencies.create("${l4jArtifact}:${workdir()}")) }
     }
 
     static String workdir() {
@@ -99,7 +112,7 @@ class Launch4jPlugin implements Plugin<Project> {
         if (os.isWindows()) {
             return 'workdir-win32'
         } else if (os.isMacOsX()) {
-            if(isBelowMacOsX108()) {
+            if (isBelowMacOsX108()) {
                 throw new GradleException('Mac OS X below version 10.8 (Mountain Lion) is not supported by launch4j version 3.11 and later. Please use an earlier version of this plugin, e.g. 2.3.0.')
             }
             return 'workdir-mac'

@@ -90,6 +90,7 @@ class CreateXML {
             xml.priority(config.priority.get())
             xml.downloadUrl(config.downloadUrl.get())
             xml.supportUrl(config.supportUrl.get())
+            xml.restartOnStatus(config.restartOnStatus.get())
             xml.stayAlive(config.stayAlive.get())
             xml.restartOnCrash(config.restartOnCrash.get())
             xml.manifest(config.manifest.get())
